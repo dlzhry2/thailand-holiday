@@ -1,9 +1,50 @@
+import os
+import logging
+from json import JSONDecodeError
+from typing import Union
+from fastapi import Header
+from fastapi.requests import Request
+from fastapi.responses import JSONResponse
+from api.adapters.aws.blob_storage import S3Manager
+from api.common.validation.validate import Validator
+
+
 class PhotoHandler:
 
-    def save(self):
-        print("hello world")
-        return {"test": "does this work"}
+    def __init__(self):
+        self.s3_manager = S3Manager("thailandphotobucket")
+        self.auth_token = os.getenv("AUTH_TOKEN")
+
+    async def save(self, request: Request, x_thai_api_token: Union[str, None] = Header(default=None)):
+        try:
+            payload = await request.json()
+        except (JSONDecodeError, TypeError) as exception:
+            logging.error(exception)
+            return JSONResponse({"error": "Invalid request"}, status_code=400)
+
+        validator = Validator(payload)
+        validator.validate_save_photos()
+
+        errors = validator.get_errors()
+
+        if errors:
+            return JSONResponse(errors, status_code=400)
+
+        if x_thai_api_token != self.auth_token:
+            return JSONResponse({"error": "Not authorised"}, status_code=403)
+
+        self.s3_manager.save(
+            payload["base64Image"].encode(),
+            payload["imageName"],
+            {
+                "caption": payload["caption"],
+                "location": payload["location"]
+            }
+        )
+
+        return {"message": "success"}
 
     def get_all(self):
-        print("hello world in get")
-        return {"test": "does this work"}
+        photos = self.s3_manager.get_all()
+
+        return {"photos": photos}
