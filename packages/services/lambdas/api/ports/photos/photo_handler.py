@@ -14,13 +14,14 @@ class PhotoHandler:
     def __init__(self):
         self.s3_manager = S3Manager("thailandphotobucket")
         self.auth_token = os.getenv("AUTH_TOKEN")
+        self.headers = {"Access-Control-Allow-Origin": "*"}
 
     async def save(self, request: Request, x_thai_api_token: Union[str, None] = Header(default=None)):
         try:
             payload = await request.json()
         except (JSONDecodeError, TypeError) as exception:
             logging.error(exception)
-            return JSONResponse({"error": "Invalid request"}, status_code=400, headers={"Access-Control-Allow-Origin": "*"})
+            return JSONResponse({"error": "Invalid request"}, status_code=400, headers=self.headers)
 
         validator = Validator(payload)
         validator.validate_save_photos()
@@ -31,7 +32,7 @@ class PhotoHandler:
             return JSONResponse(errors, status_code=400, headers={"Access-Control-Allow-Origin": "*"})
 
         if x_thai_api_token != self.auth_token:
-            return JSONResponse({"error": "Not authorised"}, status_code=403, headers={"Access-Control-Allow-Origin": "*"})
+            return JSONResponse({"error": "Not authorised"}, status_code=403, headers=self.headers)
 
         self.s3_manager.save(
             payload["base64Image"].encode(),
@@ -42,9 +43,9 @@ class PhotoHandler:
             }
         )
 
-        return JSONResponse({"message": "success"}, headers={"Access-Control-Allow-Origin": "*"})
+        return JSONResponse({"message": "success"}, headers=self.headers)
 
     def get_all(self):
         photos = self.s3_manager.get_all()
 
-        return JSONResponse({"photos": photos}, headers={"Access-Control-Allow-Origin": "*"})
+        return JSONResponse({"photos": photos}, headers=self.headers)

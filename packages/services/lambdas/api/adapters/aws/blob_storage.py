@@ -27,7 +27,6 @@ class S3Manager:
 
 def photo_payload_converter(s3_object: dict, key=str) -> dict:
     """Converts AWS S3 object response into valid photo response object"""
-    print("######TESSSTIIING", s3_object)
     photo_bytes = s3_object["Body"].read()
     meta_data = s3_object["Metadata"]
 

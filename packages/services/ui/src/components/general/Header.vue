@@ -2,6 +2,9 @@
     <div>
         <nav class="navbar navbar-stickytop navbar-expand-lg navbar-light bg-light">
             <a id="main" class="navbar-brand" href="/#/home">Thailand 2k22</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#main-nav-bar" aria-controls="main-nav-bar" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
 
             <div class="collapse navbar-collapse" id="main-nav-bar">
                 <ul class="navbar-nav mr-auto">
