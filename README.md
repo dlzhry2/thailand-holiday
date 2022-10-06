@@ -1,2 +1,5 @@
-# thailand-holiday
-cheeky little web project for my holiday photos
+# Thailand-Holiday
+Cheeky project with an API and UI service for managing holiday photos
+```
+Not for pussies who smoke sigarettes!
+```
