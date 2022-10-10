@@ -45,6 +45,14 @@ class PhotoHandler:
 
         return JSONResponse({"message": "success"}, headers=self.headers)
 
+    def get(self, photo_id: str):
+        photo = self.s3_manager.get(photo_id)
+
+        if not photo:
+            return JSONResponse({"error": "Not found"}, status_code=404, headers=self.headers)
+
+        return JSONResponse(photo, headers=self.headers)
+
     def get_all(self):
         photos = self.s3_manager.get_all()
 

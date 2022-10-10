@@ -17,6 +17,9 @@
             :key="photo.imageFileName + '-tile'"
             :imgBase64="photo.base64Image"
             :imgName="photo.imageFileName"
+            :imgCaption="photo.caption"
+            :imgLocation="photo.location"
+            :navigateToPhoto="navigateToPhoto"
             class="tile"
           />
         </div>
@@ -38,19 +41,49 @@ export default {
     return {
       msg: 'Our holiday in Thailand',
       photoList: [],
-      loading: true
+      loading: true,
+      apiUrl: 'https://pvk066q1d9.execute-api.eu-west-2.amazonaws.com/test/rest/photos'
+    }
+  },
+  watch: {
+    '$store.state.filteredImages': function() {
+      this.photoList = this.$store.state.filteredImages;
     }
   },
   async mounted () {
-    let photoResponse = await fetch('https://pvk066q1d9.execute-api.eu-west-2.amazonaws.com/test/rest/photos');
-    const fullPhotoList = await photoResponse.json();
+    let res = await fetch(this.apiUrl);
+    const fullPhotoList = await res.json();
     
-    this.photoList = fullPhotoList.photos;
+    this.photoList = await this.getAllPhotos(fullPhotoList.photos);
+    this.$store.state.fullImageList = this.photoList;
+    this.$store.commit('updateFilteredImages', this.photoList);
     this.loading = false
   },
   methods: {
     removeQueryParams () {
       this.$router.replace()
+    },
+    async fetchImage (imageKey) {
+      let photoResponse = await fetch(`${this.apiUrl}/${imageKey}`);
+      const parsedPhotoObject = await photoResponse.json();
+
+      return parsedPhotoObject;
+    },
+    async getAllPhotos (photoKeys) {
+      const allRequests = [];
+
+      for (const key of photoKeys) {
+        allRequests.push(this.fetchImage(key));
+      }
+
+      const photos = await Promise.all(allRequests);
+
+      return photos;
+    },
+    navigateToPhoto (photoKey) {
+      this.$router.push({
+        path: `/photo/${photoKey}`
+      })
     }
   }
 }

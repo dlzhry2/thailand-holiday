@@ -33,6 +33,7 @@
 </template>
 
 <script>
+import imageCompression from 'browser-image-compression';
 import LoadingSpinner from './general/LoadingSpinner.vue'
 
 export default {
@@ -52,15 +53,15 @@ export default {
         }
     },
     methods: {
-        retrievePhotoBytes (event) {
+        async retrievePhotoBytes (event) {
             if (!event.target || !event.target.files) {
                 console.log('Something went wrong')
                 return
             }
 
-            const uploadedFile = event.target.files[0]
+            const uploadedFile = await this.compressImage(event.target.files[0]);
 
-            this.imageName = uploadedFile.name
+            this.imageName = uploadedFile.name;
 
             const reader = new FileReader();
 
@@ -71,6 +72,19 @@ export default {
             if (uploadedFile) {
                 reader.readAsDataURL(uploadedFile);
             }
+        },
+        async compressImage (file) {
+            const options = {
+                maxSizeMB: 0.8
+            };
+            let compressedFile = null;
+            try {
+                compressedFile = await imageCompression(file, options);
+            } catch (error) {
+                console.log(error);
+            }
+
+            return compressedFile;
         },
         async submitPhoto (e) {
             e.preventDefault();

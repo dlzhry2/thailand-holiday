@@ -1,6 +1,5 @@
 import boto3
-from concurrent.futures import ThreadPoolExecutor
-from concurrent.futures import as_completed
+from botocore.exceptions import ClientError
 
 
 class S3Manager:
@@ -16,27 +15,27 @@ class S3Manager:
         self.aws_s3_client.put_object(Body=object_bytes, Key=key, Bucket=self.bucket_name, Metadata=metadata)
 
     def get(self, key: str):
-        s3_response = self.aws_s3_client.get_object(Bucket=self.bucket_name, Key=key)
+        try:
+            s3_response = self.aws_s3_client.get_object(Bucket=self.bucket_name, Key=key)
+
+        except ClientError:
+            return None
+
         photo_response = photo_payload_converter(s3_response, key)
 
         return photo_response
 
     def get_all(self) -> list:
         obj_list = self.aws_s3_client.list_objects(Bucket=self.bucket_name)["Contents"]
-        photos = []
+        photo_keys = []
 
         if not obj_list:
             return []
 
-        with ThreadPoolExecutor(max_workers=len(obj_list)) as executor:
-            futures = [executor.submit(self.get, obj["Key"]) for obj in obj_list]
+        for obj in obj_list:
+            photo_keys.append(obj["Key"])
 
-            for future in as_completed(futures):
-                # get the downloaded url data
-                result = future.result()
-                photos.append(result)
-
-        return photos
+        return photo_keys
 
 
 def photo_payload_converter(s3_object: dict, key: str) -> dict:

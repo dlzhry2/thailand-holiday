@@ -19,8 +19,8 @@
                     </li>
                 </ul>
                 <form class="form-inline my-2 my-lg-0">
-                    <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
-                    <button class="btn btn-outline-success my-2 my-sm-0">Search</button>
+                    <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search" v-model="searchTerm">
+                    <button class="btn btn-outline-success my-2 my-sm-0" @click="search" @keydown.enter="search">Search</button>
                 </form>
             </div>
         </nav>
@@ -30,7 +30,32 @@
 <script>
 
 export default {
-    name: 'Main-Header'
+    name: 'Main-Header',
+    data () {
+        return {
+            searchTerm: ''
+        }
+    },
+    methods: {
+        search (event) {
+            event.preventDefault();
+
+            const results = this.$store.state.fullImageList.filter(this.containsString)
+            this.$store.commit('updateFilteredImages', results)
+        },
+        containsString (imageObject) {
+            const searchTerm = this.searchTerm.toLowerCase()
+            if (
+                imageObject.caption.toLowerCase().includes(searchTerm) ||
+                imageObject.imageFileName.toLowerCase().includes(searchTerm) ||
+                imageObject.location.toLowerCase().includes(searchTerm)
+            ) {
+                return true;
+            }
+
+            return false;
+        }
+    }
 };
 </script>
 
