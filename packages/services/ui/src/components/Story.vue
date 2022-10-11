@@ -3,7 +3,6 @@
       <video controls width="400" v-on:ended="updateVideoSource" ref="videoContainer">
             <source ref="videoObjOne" :src="`data:video/webm;base64,${videoByteList[videoIdx]}`"
                     type="video/webm">
-
             <source ref="videoObjTwo" :src="`data:video/mp4;base64,${videoByteList[videoIdx]}`"
                     type="video/mp4">
         </video>

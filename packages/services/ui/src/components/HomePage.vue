@@ -6,6 +6,12 @@
         <span aria-hidden="true">&times;</span>
       </button>
     </div>
+    <div class="alert alert-success alert-dismissible fade show" role="alert" v-if="$route.query.notification === 'story-success'">
+      <strong>Success:</strong> Your story was added.
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close" @click="removeQueryParams">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
     <h1>{{ msg }}</h1>
       <div v-if="loading">
         <LoadingSpinner/>
@@ -99,7 +105,13 @@ export default {
 
       return photos;
     },
-    navigateToPhoto (photoKey) {
+    navigateToPhoto (event, photoKey) {
+      const target = event.target.tagName;
+
+      if (target === 'IMG' || target === 'A') {
+        return;
+      }
+
       this.$router.push({
         path: `/photo/${photoKey}`
       })

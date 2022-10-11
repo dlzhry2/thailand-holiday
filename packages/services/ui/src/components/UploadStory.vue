@@ -78,7 +78,7 @@ export default {
                 this.$router.push({
                     path: '/home',
                     query: {
-                        notification: 'success'
+                        notification: 'story-success'
                     }
                 })
             }

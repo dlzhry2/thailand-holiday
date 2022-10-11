@@ -1,5 +1,5 @@
 <template>
-  <div class="tile-wrapper clickable" v-on:click="navigateToPhoto(imgName)">
+  <div class="tile-wrapper clickable" v-on:click="navigateToPhoto($event, imgName)">
     <div class="tile-content">
       <div class="tile-text">
        <img :src='`data:image/jpeg;base64,${imgBase64}`' :alt="imgName"/>

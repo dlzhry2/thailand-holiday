@@ -43,6 +43,15 @@ class S3Manager:
 
         return photo_keys, video_keys
 
+    def delete(self, key: str):
+        try:
+            self.aws_s3_client.delete_object(Bucket=self.bucket_name, Key=key)
+
+        except ClientError:
+            return None
+
+        return True
+
 
 def photo_payload_converter(s3_object: dict, key: str) -> dict:
     """Converts AWS S3 object response into valid photo response object"""
