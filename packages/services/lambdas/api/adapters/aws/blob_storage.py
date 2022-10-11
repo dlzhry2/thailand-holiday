@@ -1,3 +1,4 @@
+from typing import Tuple
 import boto3
 from botocore.exceptions import ClientError
 
@@ -25,17 +26,22 @@ class S3Manager:
 
         return photo_response
 
-    def get_all(self) -> list:
+    def get_all(self) -> Tuple[list, list]:
         obj_list = self.aws_s3_client.list_objects(Bucket=self.bucket_name)["Contents"]
         photo_keys = []
+        video_keys = []
 
         if not obj_list:
-            return []
+            return [], []
 
         for obj in obj_list:
+            if "z_story_" in obj["Key"]:
+                video_keys.append(obj["Key"])
+                continue
+
             photo_keys.append(obj["Key"])
 
-        return photo_keys
+        return photo_keys, video_keys
 
 
 def photo_payload_converter(s3_object: dict, key: str) -> dict:

@@ -4,6 +4,7 @@ import {createRouter, createWebHashHistory} from 'vue-router'
 import ComingSoon from './components/ComingSoon.vue'
 import HomePage from './components/HomePage.vue'
 import UploadPhoto from './components/UploadPhoto.vue'
+import UploadStory from './components/UploadStory.vue'
 import ViewPhoto from './components/ViewPhoto.vue'
 import { createStore } from 'vuex'
 
@@ -11,7 +12,8 @@ const store = createStore({
     state () {
       return {
         filteredImages: [],
-        fullImageList: []
+        fullImageList: [],
+        storyCount: 0
       }
     },
     mutations: {
@@ -29,7 +31,8 @@ const routes = [
     { path: '/home', component: HomePage },
     { path: '/upload-photo', component: UploadPhoto },
     { path: '/coming-soon', component: ComingSoon },
-    { path: '/photo/:key', component: ViewPhoto }
+    { path: '/photo/:key', component: ViewPhoto },
+    { path: '/upload-story', component: UploadStory }
 ]
 
 const router = createRouter({
