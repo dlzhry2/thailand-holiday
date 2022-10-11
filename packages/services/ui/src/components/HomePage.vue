@@ -6,11 +6,25 @@
         <span aria-hidden="true">&times;</span>
       </button>
     </div>
+    <div class="alert alert-success alert-dismissible fade show" role="alert" v-if="$route.query.notification === 'story-success'">
+      <strong>Success:</strong> Your story was added.
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close" @click="removeQueryParams">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
     <h1>{{ msg }}</h1>
       <div v-if="loading">
         <LoadingSpinner/>
       </div>
       <div v-else>
+        <div class="story-container">
+          <h2>Stories</h2>
+          <div v-if="$store.state.storyCount > 0">
+            <UserStory :storyList="videoList"/>
+          </div>
+          <button type="button" class="btn btn-success" @click="goToUploadStory">Add new +</button>
+        </div>
+        <h2>Photo album</h2>
         <div v-if="photoList.length > 0" class="tiles">
           <PhotoTile
             v-for="photo in photoList"
@@ -23,6 +37,9 @@
             class="tile"
           />
         </div>
+        <div v-else>
+          No photos found
+        </div>
       </div>
   </div>
 </template>
@@ -30,17 +47,20 @@
 <script>
 import PhotoTile from './general/PhotoTile.vue'
 import LoadingSpinner from './general/LoadingSpinner.vue'
+import UserStory from './Story.vue'
 
 export default {
   name: 'HomePage',
   components: {
     PhotoTile,
-    LoadingSpinner
+    LoadingSpinner,
+    UserStory
   },
   data () {
     return {
       msg: 'Our holiday in Thailand',
       photoList: [],
+      videoList: [],
       loading: true,
       apiUrl: 'https://pvk066q1d9.execute-api.eu-west-2.amazonaws.com/test/rest/photos'
     }
@@ -54,9 +74,14 @@ export default {
     let res = await fetch(this.apiUrl);
     const fullPhotoList = await res.json();
     
+    /**
+     * @TODO tidy this up now that you've introduced stories. Refactor blocking code
+     */
     this.photoList = await this.getAllPhotos(fullPhotoList.photos);
+    this.videoList = await this.getAllPhotos(fullPhotoList.videos);
     this.$store.state.fullImageList = this.photoList;
     this.$store.commit('updateFilteredImages', this.photoList);
+    this.$store.state.storyCount = fullPhotoList.videos.length;
     this.loading = false
   },
   methods: {
@@ -80,9 +105,20 @@ export default {
 
       return photos;
     },
-    navigateToPhoto (photoKey) {
+    navigateToPhoto (event, photoKey) {
+      const target = event.target.tagName;
+
+      if (target === 'IMG' || target === 'A') {
+        return;
+      }
+
       this.$router.push({
         path: `/photo/${photoKey}`
+      })
+    },
+    goToUploadStory () {
+      this.$router.push({
+        path: '/upload-story'
       })
     }
   }
@@ -94,6 +130,10 @@ export default {
 h1 {
   padding-top: 20px;
   padding-bottom: 20px;
+}
+h2 {
+  padding-top: 10px;
+  padding-bottom: 10px;
 }
 h3 {
   margin: 40px 0 0;
@@ -109,6 +149,11 @@ li {
 a {
   color: #42b983;
 }
+span {
+  padding-bottom: 10px;
+  font-size: 15px;
+  font-family: Arial, Helvetica, sans-serif;
+}
 .tiles {
   display: flex;
   justify-content: space-evenly;
@@ -117,5 +162,9 @@ a {
 
 .tile {
   margin-top: 10px;
+}
+
+.story-container {
+  padding-bottom: 10px;
 }
 </style>

@@ -54,6 +54,6 @@ class PhotoHandler:
         return JSONResponse(photo, headers=self.headers)
 
     def get_all(self):
-        photos = self.s3_manager.get_all()
+        photos, videos = self.s3_manager.get_all()
 
-        return JSONResponse({"photos": photos}, headers=self.headers)
+        return JSONResponse({"photos": photos, "videos": videos}, headers=self.headers)
