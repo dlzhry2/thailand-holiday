@@ -73,12 +73,9 @@ export default {
   async mounted () {
     let res = await fetch(this.apiUrl);
     const fullPhotoList = await res.json();
-    
-    /**
-     * @TODO tidy this up now that you've introduced stories. Refactor blocking code
-     */
-    this.photoList = await this.getAllPhotos(fullPhotoList.photos);
-    this.videoList = await this.getAllPhotos(fullPhotoList.videos);
+  
+    this.photoList = await this.getAllObjects(fullPhotoList.photos);
+    this.videoList = await this.getAllObjects(fullPhotoList.videos);
     this.$store.state.fullImageList = this.photoList;
     this.$store.commit('updateFilteredImages', this.photoList);
     this.$store.state.storyCount = fullPhotoList.videos.length;
@@ -88,22 +85,22 @@ export default {
     removeQueryParams () {
       this.$router.replace()
     },
-    async fetchImage (imageKey) {
-      let photoResponse = await fetch(`${this.apiUrl}/${imageKey}`);
-      const parsedPhotoObject = await photoResponse.json();
+    async fetchObject (imageKey) {
+      let response = await fetch(`${this.apiUrl}/${imageKey}`);
+      const parsedObject = await response.json();
 
-      return parsedPhotoObject;
+      return parsedObject;
     },
-    async getAllPhotos (photoKeys) {
+    async getAllObjects(objectKeys) {
       const allRequests = [];
 
-      for (const key of photoKeys) {
-        allRequests.push(this.fetchImage(key));
+      for (const key of objectKeys) {
+        allRequests.push(this.fetchObject(key));
       }
 
-      const photos = await Promise.all(allRequests);
+      const objects = await Promise.all(allRequests);
 
-      return photos;
+      return objects;
     },
     navigateToPhoto (event, photoKey) {
       const target = event.target.tagName;

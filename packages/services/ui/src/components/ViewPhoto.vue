@@ -12,7 +12,8 @@
                     </div>
                     <div>
                         {{this.photoObject.caption}} <br>
-                        <span>Location: <a target="blank" :href="`http://maps.google.com/?q=${this.photoObject.location}`">{{this.photoObject.location}}</a></span>
+                        <span>Location: <a target="blank" :href="`http://maps.google.com/?q=${this.photoObject.location}`">{{this.photoObject.location}}</a></span><br>
+                        <span>Date: {{photoObject.date}}</span>
                     </div>
                 </div>
             </div>
