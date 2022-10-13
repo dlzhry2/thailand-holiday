@@ -12,7 +12,7 @@ from api.common.validation.validate import Validator
 class PhotoHandler:
 
     def __init__(self):
-        self.s3_manager = S3Manager("thailandphotobucket")
+        self.s3_manager = S3Manager(os.getenv("PHOTO_BUCKET_NAME"))
         self.auth_token = os.getenv("AUTH_TOKEN")
         self.headers = {"Access-Control-Allow-Origin": "*"}
 
